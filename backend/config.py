@@ -31,6 +31,12 @@ class Settings(BaseSettings):
     # immediate smoke test before your domain is verified.
     EMAIL_FROM: str = "noreply@amadoo.app"
 
+    # ── Test OTP bypass — leave BLANK in real production ──────────────────────────
+    # When set, this exact code verifies ANY email's OTP, in any environment. Lets a
+    # tester pass the email-verification screen without receiving a real email (useful
+    # before a sending domain is verified). MUST be cleared before App Store launch.
+    TEST_OTP_CODE: str = ""
+
     # ── Social Auth ───────────────────────────────────────────────────────────────
     GOOGLE_CLIENT_ID: str = ""
     APPLE_CLIENT_ID: str = ""

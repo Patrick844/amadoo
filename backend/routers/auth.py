@@ -160,7 +160,15 @@ async def verify_email(body: OTPVerifyRequest, db: AsyncSession = Depends(get_db
     issue tokens. Idempotent for password-reset OTPs (which use the OTPCode table)."""
     log.info("[VERIFY-EMAIL] Attempt for email=%s code=%s", body.email, body.code)
     now = datetime.now(timezone.utc)
-    dev_bypass = settings.ENVIRONMENT == "development" and body.code == "000000"
+    # Bypass the OTP check when: (a) local dev with the well-known 000000 code, or
+    # (b) a TEST_OTP_CODE is configured (any environment) and matches — for testers
+    # who can't receive email yet. TEST_OTP_CODE must be cleared before launch.
+    dev_bypass = (
+        (settings.ENVIRONMENT == "development" and body.code == "000000")
+        or (settings.TEST_OTP_CODE != "" and body.code == settings.TEST_OTP_CODE)
+    )
+    if dev_bypass:
+        log.warning("[OTP] ⚠️ OTP bypass used for %s (test code)", body.email)
 
     # Pending signup path — the only one that creates a new User
     pending_q = await db.execute(
@@ -306,7 +314,15 @@ async def reset_password(body: ResetPasswordRequest, db: AsyncSession = Depends(
     log.info("[RESET-PASSWORD] Attempt for email=%s code=%s", body.email, body.code)
     now = datetime.now(timezone.utc)
 
-    dev_bypass = settings.ENVIRONMENT == "development" and body.code == "000000"
+    # Bypass the OTP check when: (a) local dev with the well-known 000000 code, or
+    # (b) a TEST_OTP_CODE is configured (any environment) and matches — for testers
+    # who can't receive email yet. TEST_OTP_CODE must be cleared before launch.
+    dev_bypass = (
+        (settings.ENVIRONMENT == "development" and body.code == "000000")
+        or (settings.TEST_OTP_CODE != "" and body.code == settings.TEST_OTP_CODE)
+    )
+    if dev_bypass:
+        log.warning("[OTP] ⚠️ OTP bypass used for %s (test code)", body.email)
     if dev_bypass:
         log.warning("[RESET-PASSWORD] Dev bypass used for %s", body.email)
 
