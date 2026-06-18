@@ -11,6 +11,7 @@
       "bundleIdentifier": "com.amadoo.app",
       "buildNumber": "1",
       "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "Amadoo needs camera access to verify your identity and take profile photos.",
         "NSPhotoLibraryUsageDescription": "Amadoo needs access to your photos to let you upload profile pictures.",
         "NSPhotoLibraryAddUsageDescription": "Amadoo saves photos to your library.",
