@@ -25,6 +25,9 @@ export default function AroundMe() {
   const [region, setRegion] = useState<Region | null>(null)
   const [people, setPeople] = useState<NearbyUser[]>([])
   const [selected, setSelected] = useState<NearbyUser | null>(null)
+  // Markers must keep redrawing until their avatar image has loaded, otherwise the head
+  // snapshot is blank. Track briefly, then freeze for performance.
+  const [tracks, setTracks] = useState(true)
 
   async function load() {
     setPerm('loading')
@@ -51,6 +54,14 @@ export default function AroundMe() {
   }
 
   useEffect(() => { load() }, [token])
+
+  // Let markers redraw while avatars load, then freeze for smooth panning.
+  useEffect(() => {
+    if (!people.length) return
+    setTracks(true)
+    const t = setTimeout(() => setTracks(false), 2500)
+    return () => clearTimeout(t)
+  }, [people])
 
   function recenter() {
     if (region) mapRef.current?.animateToRegion(region, 400)
@@ -98,7 +109,7 @@ export default function AroundMe() {
             key={p.id}
             coordinate={{ latitude: p.latitude, longitude: p.longitude }}
             onPress={() => setSelected(p)}
-            tracksViewChanges={false}
+            tracksViewChanges={tracks}
           >
             <View style={styles.markerWrap}>
               <View style={[styles.markerRing, selected?.id === p.id && styles.markerRingActive]}>
@@ -112,15 +123,13 @@ export default function AroundMe() {
         ))}
       </MapView>
 
-      {/* Header overlay */}
-      <AppHeader
-        left={<CircleButton name="sliders" color={Colors.textPrimary} />}
-        center={<Logo />}
-        right={<CircleButton name="locate" color={Colors.primary} onPress={recenter} />}
-      />
-
-      {/* Top banner + safety note */}
-      <View style={styles.bannerWrap} pointerEvents="box-none">
+      {/* Top overlay — header + banner + note stacked in flow so they never overlap */}
+      <View style={styles.topOverlay} pointerEvents="box-none">
+        <AppHeader
+          left={<CircleButton name="sliders" color={Colors.textPrimary} />}
+          center={<Logo />}
+          right={<CircleButton name="locate" color={Colors.primary} onPress={recenter} />}
+        />
         <View style={styles.banner}>
           <Text style={styles.bannerText}>Connect with people around you</Text>
           <View style={styles.pinChip}><Icon name="map-pin" size={18} color={Colors.primary} /></View>
@@ -195,12 +204,12 @@ const styles = StyleSheet.create({
   markerPlaceholder: { backgroundColor: Colors.inputBackground },
   markerTip: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#fff', marginTop: -3, ...Shadows.circle },
 
-  // banner
-  bannerWrap: { position: 'absolute', top: 96, left: 16, right: 16, gap: 8 },
-  banner: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: 'rgba(255,255,255,0.94)', borderRadius: 20, padding: 14, ...Shadows.md },
+  // top overlay (header + banner + note stacked)
+  topOverlay: { position: 'absolute', top: 0, left: 0, right: 0 },
+  banner: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 16, marginTop: 4, backgroundColor: 'rgba(255,255,255,0.94)', borderRadius: 20, padding: 14, ...Shadows.md },
   bannerText: { flex: 1, fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
   pinChip: { width: 40, height: 40, borderRadius: 14, backgroundColor: Colors.primarySoft, alignItems: 'center', justifyContent: 'center' },
-  note: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', backgroundColor: 'rgba(255,255,255,0.94)', borderRadius: 14, paddingHorizontal: 12, paddingVertical: 8, ...Shadows.sm },
+  note: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', marginHorizontal: 16, marginTop: 8, backgroundColor: 'rgba(255,255,255,0.94)', borderRadius: 14, paddingHorizontal: 12, paddingVertical: 8, ...Shadows.sm },
   noteText: { fontSize: 12, color: Colors.textSecondary },
 
   // crossed-paths card
