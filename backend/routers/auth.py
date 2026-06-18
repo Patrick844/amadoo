@@ -40,11 +40,11 @@ async def _send_otp_email(email: str, code: str, purpose: str):
     log.info("[OTP] Preparing to send %s email to %s", purpose, email)
     log.info("[OTP] Code (also printed below in case email fails): %s", code)
 
-    # No SMTP credentials configured → console-only (local dev / tests). Honors the
+    # No transport configured → console-only (local dev / tests). Honors the
     # "leave blank to use console logging" contract in config.py without a wasted
-    # (and potentially hanging) network round-trip to the SMTP server.
-    if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
-        log.warning("[OTP] SMTP not configured — console fallback for %s", email)
+    # (and potentially hanging) network round-trip.
+    if not settings.RESEND_API_KEY and (not settings.SMTP_USER or not settings.SMTP_PASSWORD):
+        log.warning("[OTP] No email transport configured — console fallback for %s", email)
         print(f"\n{'='*50}\n  OTP CODE for {email}: {code}\n  Purpose: {purpose}\n{'='*50}\n")
         return
 
@@ -58,6 +58,39 @@ async def _send_otp_email(email: str, code: str, purpose: str):
     </div>
     """
 
+    def _console_fallback(reason: str):
+        log.error("[OTP] ❌ Failed to send email to %s: %s", email, reason)
+        log.warning("[OTP] FALLBACK — %s code for %s: %s", purpose, email, code)
+        print(f"\n{'='*50}")
+        print(f"  OTP CODE for {email}: {code}")
+        print(f"  Purpose: {purpose}")
+        print(f"{'='*50}\n")
+
+    # ── Preferred transport: Resend over HTTPS (works on Render, which blocks SMTP) ──
+    if settings.RESEND_API_KEY:
+        import httpx
+        try:
+            log.info("[OTP] Sending via Resend API to %s ...", email)
+            async with httpx.AsyncClient(timeout=15) as client:
+                resp = await client.post(
+                    "https://api.resend.com/emails",
+                    headers={"Authorization": f"Bearer {settings.RESEND_API_KEY}"},
+                    json={
+                        "from": settings.EMAIL_FROM,
+                        "to": [email],
+                        "subject": subject,
+                        "html": body,
+                    },
+                )
+            if resp.status_code >= 400:
+                _console_fallback(f"Resend {resp.status_code}: {resp.text}")
+            else:
+                log.info("[OTP] ✅ Email sent via Resend to %s (purpose=%s)", email, purpose)
+        except Exception as exc:
+            _console_fallback(repr(exc))
+        return
+
+    # ── Fallback transport: SMTP (local dev only — blocked on most PaaS) ──
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = settings.EMAIL_FROM

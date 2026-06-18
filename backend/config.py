@@ -18,11 +18,17 @@ class Settings(BaseSettings):
     UPLOADS_DIR: Path = Path(__file__).parent / "uploads"
     BASE_URL: str = "http://localhost:8000"
 
-    # ── Email (OTP) — leave blank to use console logging ─────────────────────────
+    # ── Email (OTP) — leave all blank to use console logging ─────────────────────
+    # Preferred path: Resend over HTTPS (port 443). Render and most PaaS block
+    # outbound SMTP (25/465/587), so RESEND_API_KEY is the production transport.
+    # SMTP_* is kept only as a local-dev fallback when no Resend key is set.
+    RESEND_API_KEY: str = ""
     SMTP_HOST: str = "smtp.gmail.com"
     SMTP_PORT: int = 587
     SMTP_USER: str = ""
     SMTP_PASSWORD: str = ""
+    # Must be a Resend-verified sender. Use "onboarding@resend.dev" for an
+    # immediate smoke test before your domain is verified.
     EMAIL_FROM: str = "noreply@amadoo.app"
 
     # ── Social Auth ───────────────────────────────────────────────────────────────
