@@ -7,6 +7,7 @@ import MapView, { Marker, type Region } from 'react-native-maps'
 import { Image as ExpoImage } from 'expo-image'
 import * as Location from 'expo-location'
 import { router } from 'expo-router'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useAuthStore } from '@/stores/auth.store'
 import { api, type NearbyUser } from '@/services/api'
 import { Colors } from '@/constants/colors'
@@ -20,7 +21,10 @@ type Perm = 'loading' | 'granted' | 'denied'
 
 export default function AroundMe() {
   const token = useAuthStore((s) => s.token)
+  const insets = useSafeAreaInsets()
   const mapRef = useRef<MapView>(null)
+  // Floating nav pill height (~64) + its bottom margin + a gap, so overlays clear it.
+  const navClearance = insets.bottom + 88
   const [perm, setPerm] = useState<Perm>('loading')
   const [region, setRegion] = useState<Region | null>(null)
   const [people, setPeople] = useState<NearbyUser[]>([])
@@ -142,7 +146,7 @@ export default function AroundMe() {
 
       {/* Selected "crossed paths" card */}
       {selected && (
-        <View style={styles.crossCard}>
+        <View style={[styles.crossCard, { bottom: navClearance + 8 }]}>
           <View style={styles.crossRing}>
             {selected.photo && <ExpoImage source={{ uri: selected.photo }} style={styles.crossImg} contentFit="cover" />}
             <View style={styles.footprint}><Icon name="footprints" size={16} color={Colors.primary} /></View>
@@ -164,7 +168,7 @@ export default function AroundMe() {
 
       {/* Bottom horizontal people strip */}
       {!selected && people.length > 0 && (
-        <View style={styles.strip} pointerEvents="box-none">
+        <View style={[styles.strip, { bottom: navClearance }]} pointerEvents="box-none">
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.stripContent}>
             {people.map((p) => (
               <TouchableOpacity key={p.id} style={styles.stripItem} onPress={() => {
