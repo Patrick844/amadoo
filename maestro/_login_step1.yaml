@@ -1,0 +1,9 @@
+appId: host.exp.Exponent
+---
+- tapOn:
+    point: "71%,94%"
+- extendedWaitUntil:
+    visible: "Next"
+    timeout: 15000
+    optional: true
+- takeScreenshot: /tmp/maestro_signin

@@ -1,0 +1,8 @@
+appId: host.exp.Exponent
+---
+- tapOn:
+    point: "50%,95%"
+- tapOn:
+    point: "50%,40%"
+- tapOn:
+    point: "10%,8%"

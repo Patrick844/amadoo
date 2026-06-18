@@ -1,0 +1,96 @@
+{
+  "expo": {
+    "name": "Amadoo",
+    "slug": "amadoo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.amadoo.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Amadoo needs camera access to verify your identity and take profile photos.",
+        "NSPhotoLibraryUsageDescription": "Amadoo needs access to your photos to let you upload profile pictures.",
+        "NSPhotoLibraryAddUsageDescription": "Amadoo saves photos to your library.",
+        "NSLocationWhenInUseUsageDescription": "Amadoo uses your location to show you people nearby.",
+        "NSFaceIDUsageDescription": "Amadoo uses Face ID to keep your account secure.",
+        "UIBackgroundModes": [
+          "remote-notification",
+          "remote-notification"
+        ]
+      }
+    },
+    "android": {
+      "package": "com.amadoo.app",
+      "versionCode": 1,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./Pages design/logo-hd-amadoo.png",
+          "backgroundColor": "#F7541B",
+          "resizeMode": "contain",
+          "imageWidth": 220
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./Pages design/logo-hd-amadoo.png",
+          "color": "#E8756A",
+          "defaultChannel": "default",
+          "sounds": []
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Amadoo needs camera access to verify your identity and take profile photos."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Amadoo needs access to your photos to let you upload profile pictures."
+        }
+      ],
+      "@react-native-community/datetimepicker",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Amadoo uses your location to show you people nearby."
+        }
+      ],
+      "expo-asset"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "scheme": "amadoo",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "649d23fb-f38b-439a-9d2b-e25fb373a60c"
+      }
+    },
+    "owner": "amadoo-app",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/649d23fb-f38b-439a-9d2b-e25fb373a60c"
+    }
+  }
+}

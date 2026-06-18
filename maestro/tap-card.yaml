@@ -1,0 +1,5 @@
+# Taps the middle of the deck card to verify it opens the full profile.
+appId: host.exp.Exponent
+---
+- tapOn:
+    point: "50%,45%"

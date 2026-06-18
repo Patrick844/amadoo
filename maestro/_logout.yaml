@@ -1,0 +1,11 @@
+appId: host.exp.Exponent
+---
+- tapOn: "Profile"
+- swipe:
+    start: "50%, 78%"
+    end: "50%, 28%"
+- swipe:
+    start: "50%, 70%"
+    end: "50%, 40%"
+- tapOn:
+    point: "33%,79%"

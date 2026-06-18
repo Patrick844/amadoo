@@ -1,0 +1,6 @@
+appId: host.exp.Exponent
+---
+- tapOn: "Log in"
+- extendedWaitUntil:
+    visible: "Next"
+    timeout: 15000

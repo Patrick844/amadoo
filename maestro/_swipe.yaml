@@ -1,0 +1,6 @@
+appId: host.exp.Exponent
+---
+- swipe:
+    start: "25%, 42%"
+    end: "92%, 38%"
+    duration: 200
